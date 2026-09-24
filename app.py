@@ -370,9 +370,8 @@ def channel_dashboard(channel_id):
     )
 
 
-def ask_ollama(prompt):
-    api_key = os.getenv("GROQ_API_KEY")
-
+def ask_groq(prompt):
+    api_key = os.getenv("GROQ_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError(
             "GROQ_API_KEY topilmadi."
@@ -518,12 +517,12 @@ def ai_channel_analysis(channel_id):
             channel,
             videos
         )
-        analysis = ask_ollama(prompt)
+        analysis = ask_groq(prompt)
 
         return jsonify({
             "ok": True,
             "analysis": analysis,
-            "model": "llama3.2",
+            "model": "openai/gpt-oss-20b",
             "video_count": len(videos),
         })
 
@@ -641,12 +640,12 @@ def ai_video_helper(channel_id):
             videos,
             topic
         )
-        content = ask_ollama(prompt)
+        content = ask_groq(prompt)
 
         return jsonify({
             "ok": True,
             "content": content,
-            "model": "llama3.2"
+            "model": "openai/gpt-oss-20b"
         })
 
     except Exception as error:
@@ -914,7 +913,7 @@ def settings_page():
         "settings.html",
         user=user,
         channel_count=len(saved_channels),
-        ai_model="llama3.2"
+        ai_model="openai/gpt-oss-20b"
     )
 
 def build_ideas_prompt(channel, videos, topic):
@@ -1014,12 +1013,12 @@ def ai_generate_ideas(channel_id):
             topic
         )
 
-        ideas = ask_ollama(prompt)
+        ideas = ask_groq(prompt)
 
         return jsonify({
             "ok": True,
             "ideas": ideas,
-            "model": "llama3.2"
+            "model": "openai/gpt-oss-20b"
         })
 
     except Exception as error:
@@ -1124,12 +1123,12 @@ def ai_assistant_chat(channel_id):
             message
         )
 
-        answer = ask_ollama(prompt)
+        answer = ask_groq(prompt)
 
         return jsonify({
             "ok": True,
             "answer": answer,
-            "model": "llama3.2"
+            "model": "openai/gpt-oss-20b"
         })
 
     except Exception as error:

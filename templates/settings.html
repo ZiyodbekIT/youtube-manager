@@ -34,10 +34,10 @@
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 <main class="main-content"><header class="topbar"><button class="mobile-menu-button" id="mobileMenuButton" type="button">☰</button><strong>Sozlamalar</strong><div class="top-profile">{% if user.picture %}<img src="{{ user.picture }}" alt="Profil">{% endif %}<div><strong>{{ user.name }}</strong><span>Foydalanuvchi</span></div></div></header>
 <div class="settings-wrap">
-<section class="settings-hero"><p class="eyebrow">YOUTUBE MANAGER</p><h1>Sozlamalar ⚙</h1><p>Interfeys, lokal AI va hisob sozlamalarini shu yerdan boshqaring.</p></section>
+<section class="settings-hero"><p class="eyebrow">YOUTUBE MANAGER</p><h1>Sozlamalar ⚙</h1><p>Interfeys, AI va hisob sozlamalarini shu yerdan boshqaring.</p></section>
 <div class="settings-grid"><div>
 <section class="settings-panel"><div class="panel-head"><div class="panel-icon">✦</div><div><h2>AI sozlamalari</h2><p>AI yordamchi uchun tanlovlar.</p></div></div>
-<div class="setting-row"><div class="setting-info"><strong>AI modeli</strong><span>Hozirgi Ollama modeli</span></div><div class="value">{{ ai_model }}</div></div>
+<div class="setting-row"><div class="setting-info"><strong>AI modeli</strong><span>Hozirgi AI modeli</span></div><div class="value">{{ ai_model }}</div></div>
 <div class="setting-row"><div class="setting-info"><strong>AI javob tili</strong><span>Asosiy javob tili</span></div><select class="select local-setting" data-key="language"><option value="uz">O‘zbekcha</option><option value="en">English</option><option value="ru">Русский</option></select></div>
 <div class="setting-row"><div class="setting-info"><strong>Qisqa javoblar</strong><span>AI javoblarini ixchamroq ko‘rsatish</span></div><label class="toggle"><input type="checkbox" class="local-setting" data-key="shortAnswers"><span></span></label></div>
 </section>
@@ -47,7 +47,7 @@
 <div class="save-row"><small>Tanlovlar shu brauzerda saqlanadi.</small><button id="saveSettings" class="save" type="button">✓ Saqlash</button></div></section>
 </div><div>
 <section class="settings-panel"><div class="panel-head"><div class="panel-icon">●</div><div><h2>Tizim holati</h2><p>Joriy konfiguratsiya.</p></div></div>
-<div class="status"><div><span class="dot"></span><strong>Lokal AI</strong></div><span class="value">{{ ai_model }}</span></div>
+<div class="status"><div><span class="dot"></span><strong>Groq AI</strong></div><span class="value">{{ ai_model }}</span></div>
 <div class="status"><div><span class="dot"></span><strong>Ulangan kanallar</strong></div><span class="value">{{ channel_count }}</span></div>
 <div class="status"><div><span class="dot"></span><strong>Google hisob</strong></div><span class="value">Ulangan</span></div></section>
 <section class="settings-panel"><div class="panel-head"><div class="panel-icon">☺</div><div><h2>Hisob</h2><p>Joriy Google profilingiz.</p></div></div>
