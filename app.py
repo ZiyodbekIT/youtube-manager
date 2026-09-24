@@ -371,45 +371,73 @@ def channel_dashboard(channel_id):
 
 
 def ask_ollama(prompt):
+    api_key = os.getenv("GROQ_API_KEY")
+
+    if not api_key:
+        raise RuntimeError(
+            "GROQ_API_KEY topilmadi."
+        )
+
     payload = json.dumps({
-        "model": "llama3.2",
-        "prompt": prompt,
-        "stream": False,
-        "options": {
-            "temperature": 0.45
-        }
+        "model": "openai/gpt-oss-20b",
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "temperature": 0.45
     }).encode("utf-8")
 
-    ollama_request = urllib.request.Request(
-        "http://127.0.0.1:11434/api/generate",
-        data=payload,
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
+    groq_request = urllib.request.Request(
+    "https://api.groq.com/openai/v1/chat/completions",
+    data=payload,
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}",
+        "User-Agent": "YouTube-Manager/1.0"
+    },
+    method="POST",
+)
 
     try:
         with urllib.request.urlopen(
-            ollama_request,
+            groq_request,
             timeout=120
         ) as response:
             data = json.loads(
                 response.read().decode("utf-8")
             )
-    except urllib.error.URLError as error:
-        raise RuntimeError(
-            "Ollama bilan ulanish bo‘lmadi. "
-            "Ollama ishlayotganini tekshiring."
-        ) from error
 
-    answer = data.get("response", "").strip()
-
-    if not answer:
-        raise RuntimeError(
-            "Ollama bo‘sh javob qaytardi."
+    except urllib.error.HTTPError as error:
+        error_body = error.read().decode(
+            "utf-8",
+            errors="ignore"
         )
 
-    return answer
+        raise RuntimeError(
+            f"Groq API xatosi ({error.code}): "
+            f"{error_body}"
+        )
 
+    except urllib.error.URLError:
+        raise RuntimeError(
+            "Groq API bilan ulanish bo‘lmadi."
+        )
+
+    try:
+        answer = data["choices"][0]["message"]["content"]
+    except (KeyError, IndexError, TypeError):
+        raise RuntimeError(
+            "Groq API noto‘g‘ri yoki bo‘sh javob qaytardi."
+        )
+
+    if not answer or not answer.strip():
+        raise RuntimeError(
+            "Groq API bo‘sh javob qaytardi."
+        )
+
+    return answer.strip()
 
 def build_channel_analysis_prompt(channel, videos):
     video_lines = []
