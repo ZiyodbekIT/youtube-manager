@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bildirishnomalar — YouTube Manager</title>
+<link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='images/logo.png') }}"
+>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+.notifications-wrap{padding:34px;max-width:1150px;margin:auto}.notif-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}.notif-head h1{margin:0 0 7px}.notif-head p{margin:0;opacity:.55}.notif-actions{display:flex;gap:10px;flex-wrap:wrap}.notif-btn{border:0;border-radius:13px;padding:11px 15px;color:#fff;background:linear-gradient(135deg,#7257ff,#9a64ff);font-weight:800;cursor:pointer}.notif-btn.secondary{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09)}.notif-list{display:grid;gap:12px}.notif-card{display:flex;gap:14px;padding:17px;border-radius:18px;background:rgba(18,19,24,.94);border:1px solid rgba(255,255,255,.08)}.notif-card.unread{border-color:rgba(123,92,255,.45);box-shadow:0 0 25px rgba(123,92,255,.08)}.notif-icon{width:46px;height:46px;flex:0 0 auto;display:grid;place-items:center;border-radius:14px;background:rgba(123,92,255,.12);font-size:20px}.notif-body{flex:1}.notif-body h3{margin:0 0 6px;font-size:15px}.notif-body p{margin:0;opacity:.65;font-size:13px;line-height:1.55}.notif-time{display:block;margin-top:8px;font-size:11px;opacity:.4}.empty{padding:45px;text-align:center;border:1px dashed rgba(255,255,255,.12);border-radius:20px;opacity:.7}.badge{display:inline-grid;place-items:center;min-width:25px;height:25px;padding:0 7px;border-radius:99px;background:#ff315f;font-size:12px;font-weight:900}@media(max-width:700px){.notifications-wrap{padding:22px 14px}.notif-head{align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body><div class="app-shell">
+<aside class="sidebar" id="sidebar">
+<div class="brand"><div class="brand-logo">
+    <img
+        src="{{ url_for('static', filename='images/logo.png') }}"
+        alt="YouTube Manager"
+    >
+</div></div>
+<button class="sidebar-close" id="sidebarClose" type="button">×</button>
+<nav class="sidebar-menu">
+<a href="{{ url_for('index') }}" class="menu-item"><span class="menu-icon">⌂</span><span>Bosh sahifa</span></a>
+<a href="{{ url_for('channels_page') }}" class="menu-item"><span class="menu-icon">▣</span><span>Kanallarim</span></a>
+<a href="{{ url_for('analytics_page') }}" class="menu-item"><span class="menu-icon">▥</span><span>Tahlil</span></a>
+<a href="{{ url_for('videos_page') }}" class="menu-item"><span class="menu-icon">▶</span><span>Videolar</span></a>
+<a href="{{ url_for('ideas_page') }}" class="menu-item"><span class="menu-icon">💡</span><span>G‘oyalar</span></a>
+<a href="{{ url_for('assistant_page') }}" class="menu-item"><span class="menu-icon">✦</span><span>AI Yordamchi</span></a>
+<a href="{{ url_for('notifications_page') }}" class="menu-item active"><span class="menu-icon">🔔</span><span>Bildirishnomalar</span>{% if unread_count %}<span class="badge">{{ unread_count }}</span>{% endif %}</a>
+<a href="{{ url_for('settings_page') }}" class="menu-item"><span class="menu-icon">⚙</span><span>Sozlamalar</span></a>
+</nav></aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<main class="main-content"><header class="topbar"><button class="mobile-menu-button" id="mobileMenuButton" type="button">☰</button><div class="top-profile">{% if user.picture %}<img src="{{ user.picture }}" alt="Profil">{% endif %}<div><strong>{{ user.name }}</strong><span>Kanal monitoringi</span></div></div></header>
+<div class="notifications-wrap">
+<section class="notif-head"><div><p style="font-size:12px;letter-spacing:2px;color:#9b7cff;font-weight:800">CHANNEL MONITOR</p><h1>🔔 Bildirishnomalar {% if unread_count %}<span class="badge">{{ unread_count }}</span>{% endif %}</h1><p>Ulangan YouTube kanallaringizdagi o‘zgarishlarni kuzating.</p></div>
+<div class="notif-actions"><form method="POST" action="{{ url_for('refresh_notifications') }}"><button class="notif-btn" type="submit">↻ Hozir tekshirish</button></form><form method="POST" action="{{ url_for('read_all_notifications') }}"><button class="notif-btn secondary" type="submit">✓ Barchasini o‘qilgan qilish</button></form></div></section>
+<section class="notif-list">
+{% for item in notifications %}
+<article class="notif-card {% if not item.is_read %}unread{% endif %}"><div class="notif-icon">{% if item.kind == 'subscribers' %}👥{% elif item.kind == 'views' %}📈{% elif item.kind == 'videos' %}🎬{% else %}🔔{% endif %}</div><div class="notif-body"><h3>{{ item.title }}</h3><p>{{ item.message }}</p><span class="notif-time">{{ item.created_at.strftime('%d.%m.%Y %H:%M') }}</span></div></article>
+{% else %}
+<div class="empty"><div style="font-size:38px;margin-bottom:10px">🔔</div><strong>Hali bildirishnoma yo‘q</strong><p>“Hozir tekshirish”ni bosing. Birinchi tekshiruv boshlang‘ich statistikani saqlaydi; keyingi tekshiruvlarda farqlar aniqlanadi.</p></div>
+{% endfor %}
+</section></div></main></div>
+<script src="{{ url_for('static', filename='script.js') }}"></script></body></html>

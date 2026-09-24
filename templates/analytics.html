@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tahlil — YouTube Manager</title>
+<link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='images/logo.png') }}"
+>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+.analytics-page{display:grid;gap:22px}
+.analytics-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.summary-card,.analytics-card{background:rgba(18,19,24,.94);border:1px solid rgba(255,255,255,.08);border-radius:20px}
+.summary-card{padding:18px}.summary-card span{font-size:12px;opacity:.55}.summary-card strong{display:block;font-size:25px;margin-top:7px}
+.analytics-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:15px;background:rgba(18,19,24,.82);border:1px solid rgba(255,255,255,.08);border-radius:18px}
+.analytics-search{flex:1;min-width:230px;display:flex;gap:9px;align-items:center;padding:0 13px;border-radius:13px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+.analytics-search input{width:100%;border:0;outline:0;background:transparent;color:#fff;padding:12px 0}
+.analytics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px}
+.analytics-card{padding:20px;transition:.18s transform,.18s border-color}.analytics-card:hover{transform:translateY(-3px);border-color:rgba(123,92,255,.38)}
+.channel-head{display:flex;gap:13px;align-items:center}.channel-head img{width:54px;height:54px;border-radius:50%;object-fit:cover}.channel-head h2{margin:0 0 4px;font-size:18px}.channel-head p{margin:0;opacity:.45;font-size:11px;overflow:hidden;text-overflow:ellipsis}
+.stat-section-title{font-size:11px;letter-spacing:1.3px;opacity:.5;margin:20px 0 9px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.stat{padding:12px 8px;background:rgba(255,255,255,.035);border-radius:13px;text-align:center}.stat strong{display:block;font-size:16px}.stat span{display:block;font-size:10px;opacity:.5;margin-top:4px}
+.engagement{margin-top:15px;padding:13px;border-radius:14px;background:rgba(123,92,255,.07);border:1px solid rgba(123,92,255,.12)}
+.engagement-head{display:flex;justify-content:space-between;gap:10px;font-size:11px;margin-bottom:8px}.engagement-head span{opacity:.55}.engagement-head strong{color:#bcaeff}
+.engagement-bar{height:7px;border-radius:99px;background:rgba(255,255,255,.06);overflow:hidden}.engagement-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#765cff,#b76cff);max-width:100%}
+.feature-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:16px}.feature-link{text-align:center;text-decoration:none;color:#fff;background:linear-gradient(135deg,#e71d3e,#ff4b2b);padding:11px;border-radius:12px;font-size:12px;font-weight:800}.feature-link.secondary{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+.empty{padding:45px;text-align:center;border:1px dashed rgba(255,255,255,.12);border-radius:20px;opacity:.75}
+@media(max-width:900px){.analytics-summary{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.analytics-summary{grid-template-columns:1fr}.analytics-grid{grid-template-columns:1fr}.feature-actions{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="app-shell">
+<aside class="sidebar" id="sidebar">
+<div class="brand"><div class="brand-logo">
+    <img
+        src="{{ url_for('static', filename='images/logo.png') }}"
+        alt="YouTube Manager"
+    >
+</div>
+</div>
+<button class="sidebar-close" id="sidebarClose" type="button">×</button>
+<nav class="sidebar-menu">
+<a href="{{ url_for('index') }}" class="menu-item"><span class="menu-icon">⌂</span><span>Bosh sahifa</span></a>
+<a href="{{ url_for('channels_page') }}" class="menu-item"><span class="menu-icon">▣</span><span>Kanallarim</span></a>
+<a href="{{ url_for('analytics_page') }}" class="menu-item active"><span class="menu-icon">▥</span><span>Tahlil</span></a>
+<a href="{{ url_for('videos_page') }}" class="menu-item"><span class="menu-icon">▶</span><span>Videolar</span></a>
+<a href="{{ url_for('ideas_page') }}" class="menu-item"><span class="menu-icon">💡</span><span>G‘oyalar</span></a>
+<a href="{{ url_for('assistant_page') }}" class="menu-item"><span class="menu-icon">✦</span><span>AI Yordamchi</span></a>
+<a href="{{ url_for('settings_page') }}" class="menu-item"><span class="menu-icon">⚙</span><span>Sozlamalar</span></a>
+</nav>
+<div class="sidebar-bottom"><div class="sidebar-user">{% if user.picture %}<img src="{{ user.picture }}" alt="Profil">{% endif %}<div><strong>{{ user.name }}</strong><span>{{ user.email }}</span></div><a href="{{ url_for('logout') }}" class="sidebar-logout">↪</a></div></div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<main class="main-content">
+<header class="topbar"><button class="mobile-menu-button" id="mobileMenuButton" type="button">☰</button><div class="top-profile">{% if user.picture %}<img src="{{ user.picture }}" alt="Profil">{% endif %}<div><strong>{{ user.name }}</strong><span>Kanal tahlili</span></div></div></header>
+<div class="dashboard-content analytics-page">
+<section class="welcome-section"><div><p class="eyebrow">ANALYTICS HUB</p><h1>Kanallar tahlili ▥</h1><p>Barcha kanallarning umumiy holati va so‘nggi 8 video natijalarini bir joyda solishtiring.</p></div></section>
+
+{% set total = namespace(subs=0, views=0, videos=0, recent_views=0) %}
+{% for channel in channels %}
+{% if channel.subscribers != "Yashirilgan" and channel.subscribers != "?" %}{% set total.subs = total.subs + (channel.subscribers|int) %}{% endif %}
+{% set total.views = total.views + (channel.views|int) %}
+{% set total.videos = total.videos + (channel.videos|int) %}
+{% set total.recent_views = total.recent_views + (channel.recent_views|int) %}
+{% endfor %}
+
+{% if channels %}
+<section class="analytics-summary">
+<div class="summary-card"><span>Jami obunachilar</span><strong>{{ total.subs|compact_number }}</strong></div>
+<div class="summary-card"><span>Jami ko‘rishlar</span><strong>{{ total.views|compact_number }}</strong></div>
+<div class="summary-card"><span>Jami videolar</span><strong>{{ total.videos|compact_number }}</strong></div>
+<div class="summary-card"><span>Oxirgi videolar ko‘rishi</span><strong>{{ total.recent_views|compact_number }}</strong></div>
+</section>
+
+<section class="analytics-toolbar">
+<label class="analytics-search"><span>⌕</span><input id="analyticsSearch" type="text" placeholder="Kanal nomi yoki ID bo‘yicha qidirish..."></label>
+</section>
+
+<section class="analytics-grid" id="analyticsGrid">
+{% for channel in channels %}
+<article class="analytics-card" data-search="{{ (channel.title ~ ' ' ~ channel.id)|lower }}">
+<div class="channel-head">{% if channel.thumbnail %}<img src="{{ channel.thumbnail }}" alt="{{ channel.title }}">{% endif %}<div><h2>{{ channel.title }}</h2><p>{{ channel.id }}</p></div></div>
+
+<div class="stat-section-title">KANAL UMUMIY NATIJASI</div>
+<div class="stat-grid">
+<div class="stat"><strong>{{ channel.subscribers|compact_number }}</strong><span>Obunachi</span></div>
+<div class="stat"><strong>{{ channel.views|compact_number }}</strong><span>Ko‘rish</span></div>
+<div class="stat"><strong>{{ channel.videos|compact_number }}</strong><span>Video</span></div>
+</div>
+
+<div class="stat-section-title">SO‘NGGI {{ channel.recent_video_count }} VIDEO</div>
+<div class="stat-grid">
+<div class="stat"><strong>{{ channel.recent_views|compact_number }}</strong><span>Ko‘rish</span></div>
+<div class="stat"><strong>{{ channel.recent_likes|compact_number }}</strong><span>Layk</span></div>
+<div class="stat"><strong>{{ channel.recent_comments|compact_number }}</strong><span>Izoh</span></div>
+</div>
+
+{% set recent_views = channel.recent_views|int %}
+{% set recent_likes = channel.recent_likes|int %}
+{% set recent_comments = channel.recent_comments|int %}
+{% if recent_views > 0 %}
+    {% set engagement = ((recent_likes + recent_comments) * 100 / recent_views) %}
+{% else %}
+    {% set engagement = 0 %}
+{% endif %}
+<div class="engagement">
+<div class="engagement-head"><span>So‘nggi videolar engagement</span><strong>{{ "%.2f"|format(engagement) }}%</strong></div>
+<div class="engagement-bar"><div class="engagement-fill" style="width:{{ [engagement, 100]|min }}%"></div></div>
+</div>
+
+<div class="feature-actions">
+<a class="feature-link" href="{{ url_for('channel_dashboard', channel_id=channel.id) }}#analytics">Batafsil tahlil →</a>
+<a class="feature-link secondary" href="{{ url_for('channel_dashboard', channel_id=channel.id) }}#assistant">✦ AI Tahlil</a>
+</div>
+</article>
+{% endfor %}
+</section>
+<div class="empty" id="analyticsEmpty" style="display:none">Qidiruv bo‘yicha kanal topilmadi.</div>
+{% else %}
+<section class="empty"><h2>Hali kanal yo‘q</h2><p>Tahlilni boshlash uchun avval YouTube kanalini ulang.</p><a class="feature-link" href="{{ url_for('index') }}#channels">Kanal qo‘shish</a></section>
+{% endif %}
+</div>
+</main></div>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>
+(function(){
+ const input=document.getElementById('analyticsSearch');
+ const empty=document.getElementById('analyticsEmpty');
+ if(!input)return;
+ input.addEventListener('input',function(){
+   const q=input.value.trim().toLowerCase();
+   let count=0;
+   document.querySelectorAll('.analytics-card').forEach(function(card){
+     const show=(card.dataset.search||'').includes(q);
+     card.style.display=show?'':'none';
+     if(show)count++;
+   });
+   if(empty)empty.style.display=count?'none':'';
+ });
+})();
+</script>
+</body>
+</html>

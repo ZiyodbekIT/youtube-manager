@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G‘oyalar — YouTube Manager</title>
+    <link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='images/logo.png') }}"
+>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .ideas-shell{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.65fr);gap:22px}
+        .ideas-card{background:rgba(20,20,24,.92);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:24px}
+        .ideas-card h2{margin:0 0 8px}.ideas-card p{opacity:.7}
+        .ideas-field{margin-top:20px}.ideas-field label{display:block;margin-bottom:8px;font-weight:700}
+        .ideas-field select,.ideas-field textarea{width:100%;box-sizing:border-box;background:#111216;color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:14px;font:inherit;outline:none}
+        .ideas-field textarea{min-height:120px;resize:vertical}
+        .ideas-field select:focus,.ideas-field textarea:focus{border-color:#ff2d45;box-shadow:0 0 0 3px rgba(255,45,69,.12)}
+        .ideas-generate{margin-top:18px;width:100%;border:0;border-radius:14px;padding:15px 18px;background:linear-gradient(135deg,#ff1838,#ff4b2b);color:#fff;font-weight:800;font-size:15px;cursor:pointer}
+        .ideas-generate:disabled{opacity:.55;cursor:not-allowed}
+        .ideas-result{white-space:pre-wrap;line-height:1.75;margin-top:18px;background:#0d0e11;border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:20px;min-height:180px}
+        .ideas-empty{text-align:center;padding:45px 20px;opacity:.65}.ideas-empty-icon{font-size:46px;margin-bottom:12px}
+        .ideas-status{margin-top:12px;font-size:14px;opacity:.75}.ideas-error{color:#ff6b7a}
+        .channel-preview{display:flex;align-items:center;gap:12px;margin-top:18px;padding:14px;background:rgba(255,255,255,.035);border-radius:16px}
+        .channel-preview img{width:48px;height:48px;border-radius:50%;object-fit:cover}
+        @media(max-width:900px){.ideas-shell{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="brand-logo">
+    <img
+        src="{{ url_for('static', filename='images/logo.png') }}"
+        alt="YouTube Manager"
+    >
+</div>
+            <div class="brand-text"><strong>YouTube</strong><span>Manager</span></div>
+        </div>
+        <button class="sidebar-close" id="sidebarClose" type="button">×</button>
+
+        <nav class="sidebar-menu">
+            <a href="{{ url_for('index') }}" class="menu-item"><span class="menu-icon">⌂</span><span>Bosh sahifa</span></a>
+            <a href="{{ url_for('channels_page') }}" class="menu-item"><span class="menu-icon">▣</span><span>Kanallarim</span></a>
+            <a href="{{ url_for('analytics_page') }}" class="menu-item"><span class="menu-icon">▥</span><span>Tahlil</span></a>
+            <a href="{{ url_for('videos_page') }}" class="menu-item"><span class="menu-icon">▶</span><span>Videolar</span></a>
+            <a href="{{ url_for('ideas_page') }}" class="menu-item active"><span class="menu-icon">💡</span><span>G‘oyalar</span><span class="new-badge">YANGI</span></a>
+            <a href="{{ url_for('assistant_page') }}" class="menu-item"><span class="menu-icon">✦</span><span>AI Yordamchi</span></a>
+            <a href="{{ url_for('settings_page') }}" class="menu-item"><span class="menu-icon">⚙</span><span>Sozlamalar</span></a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="sidebar-user">
+                {% if user.picture %}
+                    <img src="{{ user.picture }}" alt="Profil rasmi">
+                {% else %}
+                    <div class="avatar-placeholder">{{ user.name[0]|upper }}</div>
+                {% endif %}
+                <div><strong>{{ user.name }}</strong><span>{{ user.email }}</span></div>
+                <a href="{{ url_for('logout') }}" class="sidebar-logout" title="Chiqish">↪</a>
+            </div>
+        </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="mobile-menu-button" id="mobileMenuButton" type="button">☰</button>
+            <div class="top-profile">
+                {% if user.picture %}<img src="{{ user.picture }}" alt="Profil">{% endif %}
+                <div><strong>{{ user.name }}</strong><span>AI G‘oyalar</span></div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <section class="welcome-section">
+                <div>
+                    <p class="eyebrow">AI IDEA LAB</p>
+                    <h1>Yangi video g‘oyalari 💡</h1>
+                    <p>Kanal ma’lumotlaringiz asosida llama3.2 yangi kontent g‘oyalarini yaratadi.</p>
+                </div>
+            </section>
+
+            {% if channels %}
+            <section class="ideas-shell">
+                <article class="ideas-card">
+                    <h2>G‘oya yaratish</h2>
+                    <p>Kanalni tanlang. Xohlasangiz, qaysi yo‘nalishda g‘oya kerakligini ham yozing.</p>
+
+                    <div class="ideas-field">
+                        <label for="ideaChannel">YouTube kanali</label>
+                        <select id="ideaChannel">
+                            {% for channel in channels %}
+                            <option value="{{ channel.id }}">{{ channel.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="ideas-field">
+                        <label for="ideaTopic">Yo‘nalish — ixtiyoriy</label>
+                        <textarea id="ideaTopic" maxlength="300" placeholder="Masalan: Roblox, Minecraft, Stickman Party, challenge..."></textarea>
+                    </div>
+
+                    <button class="ideas-generate" id="ideasGenerate" type="button">✦ 8 ta g‘oya yaratish</button>
+                    <div class="ideas-status" id="ideasStatus">Model: llama3.2 · Lokal Ollama</div>
+                </article>
+
+                <article class="ideas-card">
+                    <h2>AI natijasi</h2>
+                    <div class="ideas-result" id="ideasResult">
+                        <div class="ideas-empty" id="ideasEmpty">
+                            <div class="ideas-empty-icon">💡</div>
+                            <strong>G‘oyalar shu yerda chiqadi</strong>
+                            <p>Chap tomondan kanalni tanlab, tugmani bosing.</p>
+                        </div>
+                    </div>
+                </article>
+            </section>
+            {% else %}
+            <section class="ideas-card">
+                <div class="ideas-empty">
+                    <div class="ideas-empty-icon">▶</div>
+                    <h2>Avval kanal qo‘shing</h2>
+                    <p>AI g‘oyalar yaratishi uchun YouTube kanali ulangan bo‘lishi kerak.</p>
+                    <a class="open-dashboard-button" href="{{ url_for('index') }}#channels">Kanallarim →</a>
+                </div>
+            </section>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% if channels %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const button = document.getElementById("ideasGenerate");
+    const channel = document.getElementById("ideaChannel");
+    const topic = document.getElementById("ideaTopic");
+    const result = document.getElementById("ideasResult");
+    const status = document.getElementById("ideasStatus");
+
+    button.addEventListener("click", async () => {
+        const channelId = channel.value;
+        if (!channelId) return;
+
+        button.disabled = true;
+        button.textContent = "AI o‘ylayapti...";
+        status.className = "ideas-status";
+        status.textContent = "llama3.2 g‘oyalarni tayyorlamoqda...";
+        result.textContent = "⏳ G‘oyalar yaratilmoqda...";
+
+        try {
+            const response = await fetch(
+                `/api/channel/${encodeURIComponent(channelId)}/ideas`,
+                {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({topic: topic.value.trim()})
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.ok) {
+                throw new Error(data.error || "G‘oyalarni yaratib bo‘lmadi.");
+            }
+
+            result.textContent = data.ideas;
+            status.textContent = `✓ Tayyor · Model: ${data.model}`;
+        } catch (error) {
+            result.textContent = "❌ " + error.message;
+            status.className = "ideas-status ideas-error";
+            status.textContent = "Xatolik yuz berdi.";
+        } finally {
+            button.disabled = false;
+            button.textContent = "✦ 8 ta g‘oya yaratish";
+        }
+    });
+});
+</script>
+{% endif %}
+</body>
+</html>

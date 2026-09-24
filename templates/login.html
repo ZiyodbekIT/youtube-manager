@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Kirish | YouTube Manager
+    </title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="{{ url_for('static', filename='images/logo.png') }}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+    <style>
+
+        .login-logo-image,
+        .login-card-logo {
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .login-logo-image img,
+        .login-card-logo img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .login-logo-image img {
+            border-radius: 12px;
+        }
+
+        .login-card-logo img {
+            border-radius: 18px;
+        }
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="login-page">
+
+    <section class="login-visual">
+
+        <div class="login-brand">
+
+            <div class="login-brand-logo login-logo-image">
+                <img
+                    src="{{ url_for('static', filename='images/logo.png') }}"
+                    alt="YouTube Manager"
+                >
+            </div>
+
+            <strong>
+                YouTube Manager
+            </strong>
+
+        </div>
+
+
+        <div class="login-visual-content">
+
+            <p class="login-kicker">
+                YOUTUBE BOSHQARUVI
+            </p>
+
+            <h1>
+                Kanallaringizni
+                <span>bitta joydan</span>
+                boshqaring.
+            </h1>
+
+            <p class="login-visual-description">
+                YouTube kanallaringizni ulang,
+                statistikalarni kuzating va barcha
+                kanallaringizni zamonaviy boshqaruv
+                panelidan boshqaring.
+            </p>
+
+
+            <div class="login-features">
+
+                <div class="login-feature">
+                    <span>📊</span>
+                    Kanal statistikasi
+                </div>
+
+                <div class="login-feature">
+                    <span>📺</span>
+                    Bir nechta kanal
+                </div>
+
+                <div class="login-feature">
+                    <span>💡</span>
+                    Video g‘oyalari
+                </div>
+
+                <div class="login-feature">
+                    <span>✦</span>
+                    AI Yordamchi
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="login-side">
+
+        <div class="login-card">
+
+            <div class="login-card-icon login-card-logo">
+                <img
+                    src="{{ url_for('static', filename='images/logo.png') }}"
+                    alt="YouTube Manager"
+                >
+            </div>
+
+            <h2>
+                Xush kelibsiz
+            </h2>
+
+            <p>
+                YouTube Manager'dan foydalanish
+                uchun Google hisobingiz orqali
+                xavfsiz kiring.
+            </p>
+
+
+            {% with messages = get_flashed_messages() %}
+
+                {% if messages %}
+
+                    <div class="flash-area">
+
+                        {% for message in messages %}
+
+                            <div class="flash-message">
+                                {{ message }}
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+            {% endwith %}
+
+
+            <a
+                href="{{ url_for('login') }}"
+                class="google-login-button"
+            >
+
+                <span class="google-icon">
+                    G
+                </span>
+
+                Google orqali kirish
+
+            </a>
+
+
+            <div class="login-security">
+
+                <span>🔒</span>
+
+                <p>
+                    Kirish Google OAuth orqali
+                    himoyalangan.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+
+</html>

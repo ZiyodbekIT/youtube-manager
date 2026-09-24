@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Videolar — YouTube Manager</title>
+<link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='images/logo.png') }}"
+>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+.video-page{display:grid;gap:22px}
+.video-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:16px;border:1px solid rgba(255,255,255,.08);background:rgba(18,19,24,.82);border-radius:18px}
+.video-search{flex:1;min-width:240px;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:0 13px}
+.video-search input{width:100%;border:0;outline:0;background:transparent;color:#fff;padding:12px 0}
+.channel-filter{border:1px solid rgba(255,255,255,.08);background:#15171d;color:#fff;border-radius:13px;padding:12px 14px;outline:0}
+.video-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.summary-card{padding:17px;border-radius:17px;background:rgba(18,19,24,.94);border:1px solid rgba(255,255,255,.08)}
+.summary-card span{font-size:12px;opacity:.55}.summary-card strong{display:block;font-size:24px;margin-top:7px}
+.video-channel{margin-bottom:30px}
+.video-channel-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px}
+.channel-title-wrap{display:flex;align-items:center;gap:12px}
+.video-channel-head img{width:48px;height:48px;border-radius:50%;object-fit:cover}
+.video-channel-head h2{margin:0 0 4px}.video-channel-head span{font-size:12px;opacity:.55}
+.channel-dashboard-link{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.05);padding:9px 12px;border-radius:11px;font-size:12px}
+.video-grid-all{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:17px}
+.video-item-all{overflow:hidden;background:rgba(18,19,24,.94);border:1px solid rgba(255,255,255,.08);border-radius:19px;transition:.18s transform,.18s border-color}
+.video-item-all:hover{transform:translateY(-3px);border-color:rgba(255,49,95,.38)}
+.video-thumb-wrap{position:relative;aspect-ratio:16/9;background:#111;overflow:hidden}
+.video-thumb{width:100%;height:100%;object-fit:cover}
+.best-badge{position:absolute;top:10px;left:10px;background:#ff315f;color:#fff;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:900}
+.video-info{padding:15px}.video-info h3{font-size:15px;line-height:1.4;margin:0 0 12px;min-height:42px}
+.video-numbers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px}
+.video-number{padding:9px;background:rgba(255,255,255,.04);border-radius:10px}
+.video-number b{display:block;margin-top:3px;font-size:13px;color:#fff}
+.video-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:13px}
+.video-open{display:block;text-decoration:none;text-align:center;color:#fff;padding:10px;background:rgba(255,255,255,.06);border-radius:11px;font-size:12px}
+.video-open.primary{background:linear-gradient(135deg,#ff315f,#ff174d)}
+.video-empty{padding:45px;text-align:center;border:1px dashed rgba(255,255,255,.12);border-radius:20px;opacity:.7}
+@media(max-width:900px){.video-summary{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.video-summary{grid-template-columns:1fr}.video-channel-head{align-items:flex-start;flex-direction:column}.video-actions{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="app-shell">
+<aside class="sidebar" id="sidebar">
+<div class="brand"><div class="brand-logo">
+    <img
+        src="{{ url_for('static', filename='images/logo.png') }}"
+        alt="YouTube Manager"
+    >
+</div></div>
+<button class="sidebar-close" id="sidebarClose" type="button">×</button>
+<nav class="sidebar-menu">
+<a href="{{ url_for('index') }}" class="menu-item"><span class="menu-icon">⌂</span><span>Bosh sahifa</span></a>
+<a href="{{ url_for('channels_page') }}" class="menu-item"><span class="menu-icon">▣</span><span>Kanallarim</span></a>
+<a href="{{ url_for('analytics_page') }}" class="menu-item"><span class="menu-icon">▥</span><span>Tahlil</span></a>
+<a href="{{ url_for('videos_page') }}" class="menu-item active"><span class="menu-icon">▶</span><span>Videolar</span></a>
+<a href="{{ url_for('ideas_page') }}" class="menu-item"><span class="menu-icon">💡</span><span>G‘oyalar</span></a>
+<a href="{{ url_for('assistant_page') }}" class="menu-item"><span class="menu-icon">✦</span><span>AI Yordamchi</span></a>
+<a href="{{ url_for('settings_page') }}" class="menu-item"><span class="menu-icon">⚙</span><span>Sozlamalar</span></a>
+</nav>
+<div class="sidebar-bottom"><div class="sidebar-user">{% if user.picture %}<img src="{{ user.picture }}" alt="Profil">{% endif %}<div><strong>{{ user.name }}</strong><span>{{ user.email }}</span></div><a href="{{ url_for('logout') }}" class="sidebar-logout">↪</a></div></div>
+</aside>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<main class="main-content">
+<header class="topbar"><button class="mobile-menu-button" id="mobileMenuButton" type="button">☰</button><div class="top-profile">{% if user.picture %}<img src="{{ user.picture }}" alt="Profil">{% endif %}<div><strong>{{ user.name }}</strong><span>Videolar</span></div></div></header>
+<div class="dashboard-content video-page">
+<section class="welcome-section"><div><p class="eyebrow">VIDEO LIBRARY</p><h1>Videolar ▶</h1><p>Barcha ulangan kanallaringizdagi so‘nggi videolar va asosiy natijalar.</p></div></section>
+
+{% set stats = namespace(videos=0, views=0, likes=0, comments=0) %}
+{% for item in channels %}
+    {% for video in item.videos %}
+        {% set stats.videos = stats.videos + 1 %}
+        {% set stats.views = stats.views + (video.views|int) %}
+        {% set stats.likes = stats.likes + (video.likes|int) %}
+        {% set stats.comments = stats.comments + (video.comments|int) %}
+    {% endfor %}
+{% endfor %}
+
+{% if channels %}
+<section class="video-summary">
+<div class="summary-card"><span>Ko‘rsatilgan videolar</span><strong>{{ stats.videos }}</strong></div>
+<div class="summary-card"><span>Jami ko‘rishlar</span><strong>{{ stats.views|compact_number }}</strong></div>
+<div class="summary-card"><span>Jami layklar</span><strong>{{ stats.likes|compact_number }}</strong></div>
+<div class="summary-card"><span>Jami izohlar</span><strong>{{ stats.comments|compact_number }}</strong></div>
+</section>
+
+<section class="video-toolbar">
+<label class="video-search"><span>⌕</span><input id="videoSearch" type="text" placeholder="Video nomini qidirish..."></label>
+<select class="channel-filter" id="channelFilter">
+<option value="all">Barcha kanallar</option>
+{% for item in channels %}<option value="{{ item.channel.id }}">{{ item.channel.title }}</option>{% endfor %}
+</select>
+</section>
+
+<div id="videoLibrary">
+{% for item in channels %}
+<section class="video-channel" data-channel="{{ item.channel.id }}">
+<div class="video-channel-head">
+<div class="channel-title-wrap">{% if item.channel.thumbnail %}<img src="{{ item.channel.thumbnail }}" alt="{{ item.channel.title }}">{% endif %}<div><h2>{{ item.channel.title }}</h2><span>{{ item.videos|length }} ta so‘nggi video</span></div></div>
+<a class="channel-dashboard-link" href="{{ url_for('channel_dashboard', channel_id=item.channel.id) }}#videos">Kanal dashboardi →</a>
+</div>
+
+{% set best = namespace(views=-1, id='') %}
+{% for video in item.videos %}
+    {% if video.views|int > best.views %}
+        {% set best.views = video.views|int %}
+        {% set best.id = video.id|default('', true) %}
+    {% endif %}
+{% endfor %}
+
+<div class="video-grid-all">
+{% for video in item.videos %}
+<article class="video-item-all" data-title="{{ video.title|lower }}">
+<div class="video-thumb-wrap">
+{% if video.thumbnail %}<img class="video-thumb" src="{{ video.thumbnail }}" alt="{{ video.title }}">{% endif %}
+{% if video.id|default('', true) == best.id and item.videos|length > 0 %}<span class="best-badge">★ ENG KO‘P KO‘RILGAN</span>{% endif %}
+</div>
+<div class="video-info">
+<h3>{{ video.title }}</h3>
+<div class="video-numbers">
+<div class="video-number">👁 Ko‘rish<b>{{ video.views|compact_number }}</b></div>
+<div class="video-number">👍 Layk<b>{{ video.likes|compact_number }}</b></div>
+<div class="video-number">💬 Izoh<b>{{ video.comments|compact_number }}</b></div>
+</div>
+<div class="video-actions">
+{% if video.id|default('', true) %}
+<a class="video-open primary" href="https://www.youtube.com/watch?v={{ video.id }}" target="_blank" rel="noopener noreferrer">YouTube’da ochish ↗</a>
+{% else %}
+<a class="video-open primary" href="{{ url_for('channel_dashboard', channel_id=item.channel.id) }}#videos">Videoni ko‘rish</a>
+{% endif %}
+<a class="video-open" href="{{ url_for('assistant_page') }}?channel={{ item.channel.id }}">AI Yordamchi ✦</a>
+</div>
+</div>
+</article>
+{% else %}
+<div class="video-empty">Bu kanalda ko‘rsatish uchun video topilmadi.</div>
+{% endfor %}
+</div>
+</section>
+{% endfor %}
+</div>
+<div class="video-empty" id="videoSearchEmpty" style="display:none">Qidiruv bo‘yicha video topilmadi.</div>
+{% else %}
+<section class="video-empty"><h2>Hali kanal yo‘q</h2><p>Videolarni ko‘rish uchun avval YouTube kanalini ulang.</p><a class="video-open primary" href="{{ url_for('index') }}#channels">Kanal qo‘shish</a></section>
+{% endif %}
+</div>
+</main></div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>
+(function () {
+    const search = document.getElementById('videoSearch');
+    const filter = document.getElementById('channelFilter');
+    const empty = document.getElementById('videoSearchEmpty');
+    if (!search || !filter) return;
+
+    function applyFilters() {
+        const query = search.value.trim().toLowerCase();
+        const selected = filter.value;
+        let visibleCards = 0;
+
+        document.querySelectorAll('.video-channel').forEach(section => {
+            const channelMatch = selected === 'all' || section.dataset.channel === selected;
+            let sectionVisible = 0;
+
+            section.querySelectorAll('.video-item-all').forEach(card => {
+                const titleMatch = (card.dataset.title || '').includes(query);
+                const show = channelMatch && titleMatch;
+                card.style.display = show ? '' : 'none';
+                if (show) {
+                    sectionVisible++;
+                    visibleCards++;
+                }
+            });
+
+            section.style.display = sectionVisible ? '' : 'none';
+        });
+
+        if (empty) empty.style.display = visibleCards ? 'none' : '';
+    }
+
+    search.addEventListener('input', applyFilters);
+    filter.addEventListener('change', applyFilters);
+})();
+</script>
+</body>
+</html>

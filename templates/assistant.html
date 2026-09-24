@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Yordamchi — YouTube Manager</title>
+    <link
+        rel="icon"
+        type="image/png"
+        href="{{ url_for('static', filename='images/logo.png') }}"
+    >
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .chat-layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:22px;min-height:620px}
+        .chat-panel{background:rgba(18,19,24,.94);border:1px solid rgba(255,255,255,.08);border-radius:24px;overflow:hidden}
+        .chat-side{padding:22px}.chat-side h2{margin:0 0 8px}.chat-side p{opacity:.65;line-height:1.55}
+        .chat-select{width:100%;margin-top:18px;background:#101116;color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:13px}
+        .chat-main{display:flex;flex-direction:column;min-height:620px}
+        .chat-head{padding:20px 22px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between}
+        .chat-head strong{font-size:18px}.ai-online{font-size:13px;color:#65e6a5}
+        .chat-messages{flex:1;padding:22px;overflow:auto;display:flex;flex-direction:column;gap:15px;max-height:510px}
+        .bubble{max-width:82%;padding:14px 16px;border-radius:18px;line-height:1.65;white-space:pre-wrap}
+        .bubble-ai{align-self:flex-start;background:#111218;border:1px solid rgba(255,255,255,.08);border-bottom-left-radius:5px}
+        .bubble-user{align-self:flex-end;background:linear-gradient(135deg,#e51d3d,#ff4a2d);border-bottom-right-radius:5px}
+        .chat-input-row{padding:16px;border-top:1px solid rgba(255,255,255,.07);display:flex;gap:10px}
+        .chat-input-row textarea{flex:1;min-height:52px;max-height:130px;resize:vertical;background:#0e0f13;color:#fff;border:1px solid rgba(255,255,255,.1);border-radius:15px;padding:14px;font:inherit;outline:none}
+        .chat-input-row textarea:focus{border-color:#ff304d}
+        .chat-send{min-width:110px;border:0;border-radius:15px;background:linear-gradient(135deg,#ff1738,#ff542d);color:#fff;font-weight:800;cursor:pointer}
+        .chat-send:disabled{opacity:.55;cursor:not-allowed}
+        .quick-questions{display:flex;flex-direction:column;gap:8px;margin-top:22px}
+        .quick-question{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:#fff;border-radius:12px;padding:11px;text-align:left;cursor:pointer}
+        .quick-question:hover{background:rgba(255,255,255,.08)}
+        @media(max-width:900px){.chat-layout{grid-template-columns:1fr}.chat-main{min-height:560px}}
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+        <div class="brand"><div class="brand-logo">
+            <img
+                src="{{ url_for('static', filename='images/logo.png') }}"
+                alt="YouTube Manager"
+            >
+</div></div>
+        <button class="sidebar-close" id="sidebarClose" type="button">×</button>
+        <nav class="sidebar-menu">
+            <a href="{{ url_for('index') }}" class="menu-item"><span class="menu-icon">⌂</span><span>Bosh sahifa</span></a>
+            <a href="{{ url_for('channels_page') }}" class="menu-item"><span class="menu-icon">▣</span><span>Kanallarim</span></a>
+            <a href="{{ url_for('analytics_page') }}" class="menu-item"><span class="menu-icon">▥</span><span>Tahlil</span></a>
+            <a href="{{ url_for('videos_page') }}" class="menu-item"><span class="menu-icon">▶</span><span>Videolar</span></a>
+            <a href="{{ url_for('ideas_page') }}" class="menu-item"><span class="menu-icon">💡</span><span>G‘oyalar</span></a>
+            <a href="{{ url_for('assistant_page') }}" class="menu-item active"><span class="menu-icon">✦</span><span>AI Yordamchi</span></a>
+            <a href="{{ url_for('settings_page') }}" class="menu-item"><span class="menu-icon">⚙</span><span>Sozlamalar</span></a>
+        </nav>
+        <div class="sidebar-bottom">
+            <div class="sidebar-user">
+                {% if user.picture %}<img src="{{ user.picture }}" alt="Profil rasmi">{% else %}<div class="avatar-placeholder">{{ user.name[0]|upper }}</div>{% endif %}
+                <div><strong>{{ user.name }}</strong><span>{{ user.email }}</span></div>
+                <a href="{{ url_for('logout') }}" class="sidebar-logout">↪</a>
+            </div>
+        </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="mobile-menu-button" id="mobileMenuButton" type="button">☰</button>
+            <div class="top-profile">
+                {% if user.picture %}<img src="{{ user.picture }}" alt="Profil">{% endif %}
+                <div><strong>{{ user.name }}</strong><span>AI Yordamchi</span></div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <section class="welcome-section">
+                <div>
+                    <p class="eyebrow">LOCAL AI ASSISTANT</p>
+                    <h1>AI Yordamchi ✦</h1>
+                    <p>Kanalingiz haqida savol bering. Yordamchi kanal va oxirgi videolar ma’lumotlaridan foydalanadi.</p>
+                </div>
+            </section>
+
+            {% if channels %}
+            <section class="chat-layout">
+                <aside class="chat-panel chat-side">
+                    <h2>Kanal</h2>
+                    <p>AI qaysi kanal ma’lumotlaridan foydalanishini tanlang.</p>
+                    <select id="assistantChannel" class="chat-select">
+                        {% for channel in channels %}
+                        <option value="{{ channel.id }}">{{ channel.title }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <div class="quick-questions">
+                        <strong>Tezkor savollar</strong>
+                        <button class="quick-question" type="button">Kanalimni qanday yaxshilashim mumkin?</button>
+                        <button class="quick-question" type="button">Oxirgi videolarimdan qaysi biri yaxshi ishlagan?</button>
+                        <button class="quick-question" type="button">Keyingi videom uchun mavzu tavsiya qil.</button>
+                        <button class="quick-question" type="button">Video nomlarini qanday yaxshilash mumkin?</button>
+                    </div>
+                </aside>
+
+                <article class="chat-panel chat-main">
+                    <div class="chat-head">
+                        <strong>✦ llama3.2</strong>
+                        <span class="ai-online">● Lokal AI</span>
+                    </div>
+
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="bubble bubble-ai">Salom! Kanal bo‘yicha savolingizni yozing. Men kanal statistikasi va so‘nggi videolardan foydalanib yordam beraman.</div>
+                    </div>
+
+                    <div class="chat-input-row">
+                        <textarea id="assistantMessage" maxlength="1000" placeholder="Masalan: Oxirgi videolarimga qarab keyingi video uchun nima tavsiya qilasan?"></textarea>
+                        <button id="assistantSend" class="chat-send" type="button">Yubor ➜</button>
+                    </div>
+                </article>
+            </section>
+            {% else %}
+            <section class="chat-panel">
+                <div style="padding:50px;text-align:center">
+                    <h2>Avval YouTube kanalini ulang</h2>
+                    <p>AI yordamchi kanal ma’lumotlaridan foydalanishi uchun kamida bitta kanal kerak.</p>
+                    <a href="{{ url_for('index') }}#channels" class="open-dashboard-button">Kanallarim →</a>
+                </div>
+            </section>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+{% if channels %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const channel = document.getElementById("assistantChannel");
+    const message = document.getElementById("assistantMessage");
+    const send = document.getElementById("assistantSend");
+    const messages = document.getElementById("chatMessages");
+    const quick = document.querySelectorAll(".quick-question");
+
+    function addBubble(text, type) {
+        const bubble = document.createElement("div");
+        bubble.className = "bubble " + (type === "user" ? "bubble-user" : "bubble-ai");
+        bubble.textContent = text;
+        messages.appendChild(bubble);
+        messages.scrollTop = messages.scrollHeight;
+        return bubble;
+    }
+
+    async function askAI() {
+        const value = message.value.trim();
+        if (!value || send.disabled) return;
+
+        addBubble(value, "user");
+        message.value = "";
+        send.disabled = true;
+        send.textContent = "...";
+
+        const loading = addBubble("AI javob tayyorlamoqda...", "ai");
+
+        try {
+            const response = await fetch(
+                `/api/channel/${encodeURIComponent(channel.value)}/assistant`,
+                {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({message: value})
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.ok) {
+                throw new Error(data.error || "AI javob bera olmadi.");
+            }
+
+            loading.textContent = data.answer;
+        } catch (error) {
+            loading.textContent = "❌ " + error.message;
+        } finally {
+            send.disabled = false;
+            send.textContent = "Yubor ➜";
+            message.focus();
+        }
+    }
+
+    send.addEventListener("click", askAI);
+
+    message.addEventListener("keydown", event => {
+        if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            askAI();
+        }
+    });
+
+    quick.forEach(button => {
+        button.addEventListener("click", () => {
+            message.value = button.textContent.trim();
+            message.focus();
+        });
+    });
+});
+</script>
+{% endif %}
+</body>
+</html>

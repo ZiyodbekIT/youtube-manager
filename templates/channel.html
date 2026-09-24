@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {{ channel.title }} | YouTube Manager
+    </title>
+
+    <link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='images/logo.png') }}"
+>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="channel-dashboard-page">
+
+    <!-- CHANNEL SIDEBAR -->
+
+    <aside class="channel-side">
+
+        <a
+            href="{{ url_for('index') }}"
+            class="channel-side-brand"
+        >
+            <div class="brand-logo">
+    <img
+        src="{{ url_for('static', filename='images/logo.png') }}"
+        alt="YouTube Manager"
+    >
+</div>>
+
+            <div>
+                <strong>YouTube</strong>
+                <span>Manager</span>
+            </div>
+        </a>
+
+
+        <div class="channel-side-profile">
+
+            {% if channel.thumbnail %}
+
+                <img
+                    src="{{ channel.thumbnail }}"
+                    alt="{{ channel.title }}"
+                >
+
+            {% else %}
+
+                <div class="channel-side-placeholder">
+                    ▶
+                </div>
+
+            {% endif %}
+
+            <strong>
+                {{ channel.title }}
+            </strong>
+
+            <span>
+                {{ channel.custom_url or channel.id }}
+            </span>
+
+            <div class="connected-pill">
+                <i></i>
+                Ulangan
+            </div>
+
+        </div>
+
+
+        <nav class="channel-side-menu">
+
+            <a
+                href="#overview"
+                class="channel-nav active"
+            >
+                <span>⌂</span>
+                Umumiy
+            </a>
+
+            <a
+                href="#analytics"
+                class="channel-nav"
+            >
+                <span>▥</span>
+                Tahlil
+            </a>
+
+            <a
+                href="#videos"
+                class="channel-nav"
+            >
+                <span>▶</span>
+                Videolar
+            </a>
+
+            <a
+                href="#assistant"
+                class="channel-nav"
+            >
+                <span>✦</span>
+                AI Yordamchi
+            </a>
+
+        </nav>
+
+
+        <div class="channel-side-bottom">
+
+            <a
+                href="{{ url_for('index') }}"
+                class="back-home-button"
+            >
+                ← Bosh sahifaga qaytish
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+
+    <main class="channel-main">
+
+        <header class="channel-topbar">
+
+            <div>
+
+                <span class="channel-top-label">
+                    KANAL BOSHQARUVI
+                </span>
+
+                <h2>
+                    {{ channel.title }}
+                </h2>
+
+            </div>
+
+
+            <div class="channel-top-user">
+
+                <div class="live-status">
+                    <i></i>
+                    API ulangan
+                </div>
+
+                {% if user.picture %}
+
+                    <img
+                        src="{{ user.picture }}"
+                        alt="{{ user.name }}"
+                    >
+
+                {% else %}
+
+                    <div class="top-avatar">
+                        {{ user.name[0]|upper }}
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </header>
+
+
+        <div class="channel-page-content">
+
+            <!-- HERO -->
+
+            <section
+                class="channel-hero"
+                id="overview"
+            >
+
+                <div class="hero-light"></div>
+
+                <div class="channel-hero-left">
+
+                    <div class="channel-hero-avatar">
+
+                        {% if channel.thumbnail %}
+
+                            <img
+                                src="{{ channel.thumbnail }}"
+                                alt="{{ channel.title }}"
+                            >
+
+                        {% else %}
+
+                            <span>▶</span>
+
+                        {% endif %}
+
+                        <div class="verified-dot">
+                            ✓
+                        </div>
+
+                    </div>
+
+
+                    <div class="channel-hero-info">
+
+                        <p>
+                            YOUTUBE KANALI
+                        </p>
+
+                        <h1>
+                            {{ channel.title }}
+                        </h1>
+
+                        <span>
+                            {{ channel.custom_url or channel.id }}
+                        </span>
+
+
+                        <div class="channel-hero-tags">
+
+                            <b>
+                                ● Faol
+                            </b>
+
+                            {% if channel.country %}
+
+                                <b>
+                                    🌐 {{ channel.country }}
+                                </b>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hero-youtube-logo">
+
+                    <div class="hero-play-button">
+                        ▶
+                    </div>
+
+                    <div class="hero-ring ring-one"></div>
+                    <div class="hero-ring ring-two"></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- MAIN STATS -->
+
+            <section class="channel-main-stats">
+
+                <article class="channel-stat-box red">
+
+                    <div class="channel-stat-icon">
+                        👥
+                    </div>
+
+                    <div>
+                        <span>
+                            Obunachilar
+                        </span>
+
+                        <strong
+                            class="counter"
+                            data-value="{{ channel.subscribers if channel.subscribers != 'Yashirilgan' else 0 }}"
+                        >
+                            0
+                        </strong>
+
+                        <small>
+                            Kanal obunachilari
+                        </small>
+                    </div>
+
+                    <div class="stat-wave">
+                        〰
+                    </div>
+
+                </article>
+
+
+                <article class="channel-stat-box blue">
+
+                    <div class="channel-stat-icon">
+                        👁
+                    </div>
+
+                    <div>
+                        <span>
+                            Jami ko‘rishlar
+                        </span>
+
+                        <strong
+                            class="counter"
+                            data-value="{{ channel.views }}"
+                        >
+                            0
+                        </strong>
+
+                        <small>
+                            Barcha videolar
+                        </small>
+                    </div>
+
+                    <div class="stat-wave">
+                        〰
+                    </div>
+
+                </article>
+
+
+                <article class="channel-stat-box purple">
+
+                    <div class="channel-stat-icon">
+                        ▶
+                    </div>
+
+                    <div>
+                        <span>
+                            Videolar
+                        </span>
+
+                        <strong
+                            class="counter"
+                            data-value="{{ channel.videos }}"
+                        >
+                            0
+                        </strong>
+
+                        <small>
+                            Jami yuklangan
+                        </small>
+                    </div>
+
+                    <div class="stat-wave">
+                        〰
+                    </div>
+
+                </article>
+
+
+                <article class="channel-stat-box green">
+
+                    <div class="channel-stat-icon">
+                        👍
+                    </div>
+
+                    <div>
+                        <span>
+                            So‘nggi videolar layklari
+                        </span>
+
+                        <strong
+                            class="counter"
+                            data-value="{{ total_likes }}"
+                        >
+                            0
+                        </strong>
+
+                        <small>
+                            Oxirgi {{ videos|length }} video
+                        </small>
+                    </div>
+
+                    <div class="stat-wave">
+                        〰
+                    </div>
+
+                </article>
+
+            </section>
+
+
+            <!-- ANALYTICS -->
+
+            <section
+                class="channel-middle-grid"
+                id="analytics"
+            >
+
+                <article class="analytics-card">
+
+                    <div class="dashboard-card-header">
+
+                        <div>
+                            <span class="small-label">
+                                TAHLIL
+                            </span>
+
+                            <h2>
+                                So‘nggi videolar ko‘rishlari
+                            </h2>
+                        </div>
+
+                        <div class="chart-live">
+                            ● Jonli ma'lumot
+                        </div>
+
+                    </div>
+
+
+                    {% if videos %}
+
+                        <div
+                            class="animated-chart"
+                            id="animatedChart"
+                            data-values='{{ video_chart_values|tojson }}'
+                        >
+
+                            <div class="chart-grid-lines">
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                                <i></i>
+                            </div>
+
+                            <svg
+                                viewBox="0 0 700 220"
+                                preserveAspectRatio="none"
+                            >
+
+                                <defs>
+
+                                    <linearGradient
+                                        id="chartGradient"
+                                        x1="0"
+                                        y1="0"
+                                        x2="0"
+                                        y2="1"
+                                    >
+
+                                        <stop
+                                            offset="0%"
+                                            stop-color="#ff2438"
+                                            stop-opacity="0.38"
+                                        />
+
+                                        <stop
+                                            offset="100%"
+                                            stop-color="#ff2438"
+                                            stop-opacity="0"
+                                        />
+
+                                    </linearGradient>
+
+                                </defs>
+
+
+                                <path
+                                    id="chartArea"
+                                    class="chart-area"
+                                    d=""
+                                ></path>
+
+                                <path
+                                    id="chartLine"
+                                    class="chart-line"
+                                    d=""
+                                ></path>
+
+                            </svg>
+
+
+                            <div
+                                class="chart-points"
+                                id="chartPoints"
+                            ></div>
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="analytics-empty">
+
+                            <div>📈</div>
+
+                            <strong>
+                                Hali video ma'lumoti yo‘q
+                            </strong>
+
+                            <span>
+                                Kanalga video yuklanganda
+                                grafik shu yerda paydo bo‘ladi.
+                            </span>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="analytics-summary">
+
+                        <div>
+                            <span>
+                                Oxirgi videolar ko‘rishlari
+                            </span>
+
+                            <strong>
+                                {{ total_video_views|compact_number }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>
+                                Layklar
+                            </span>
+
+                            <strong>
+                                {{ total_likes|compact_number }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>
+                                Izohlar
+                            </span>
+
+                            <strong>
+                                {{ total_comments|compact_number }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </article>
+
+
+                <!-- QUICK ACTIONS -->
+
+                <article
+                    class="quick-actions-card"
+                    id="assistant"
+                >
+
+                    <div class="dashboard-card-header">
+
+                        <div>
+                            <span class="small-label">
+                                VOSITALAR
+                            </span>
+
+                            <h2>
+                                Tezkor amallar
+                            </h2>
+                        </div>
+
+                        <span class="sparkle">
+                            ✦
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        class="quick-action ai-action"
+                        id="aiAnalysisButton"
+                        type="button"
+                        data-analysis-url="{{ url_for('ai_channel_analysis', channel_id=channel.id) }}"
+                    >
+
+                        <div class="quick-icon">
+                            ✦
+                        </div>
+
+                        <div>
+                            <strong>
+                                AI kanal tahlili
+                            </strong>
+
+                            <span>
+                                Kanalni AI bilan tahlil qilish
+                            </span>
+                        </div>
+
+                        <b>→</b>
+
+                    </button>
+
+
+                    <button
+                        class="quick-action"
+                        id="videoHelperButton"
+                        type="button"
+                        data-video-helper-url="{{ url_for('ai_video_helper', channel_id=channel.id) }}"
+                    >
+
+                        <div class="quick-icon idea">
+                            💡
+                        </div>
+
+                        <div>
+                            <strong>
+                                AI Video Yordamchi
+                            </strong>
+
+                            <span>
+                                Title, tavsif, tag va thumbnail g‘oyasi
+                            </span>
+                        </div>
+
+                        <b>→</b>
+
+                    </button>
+
+
+                    <button
+                        class="quick-action"
+                        id="channelAnalyticsButton"
+                        type="button"
+                    >
+
+                        <div class="quick-icon search">
+                            🔎
+                        </div>
+
+                        <div>
+                            <strong>
+                                Kanal tahlili
+                            </strong>
+
+                            <span>
+                                Statistikani chuqur ko‘rish
+                            </span>
+                        </div>
+
+                        <b>→</b>
+
+                    </button>
+
+
+                    {% if most_viewed_video %}
+
+                        <div class="best-video-mini">
+
+                            <span>
+                                🏆 ENG KO‘P KO‘RILGAN
+                            </span>
+
+                            <strong>
+                                {{ most_viewed_video.title }}
+                            </strong>
+
+                            <p>
+                                👁
+                                {{
+                                    most_viewed_video.views
+                                    |compact_number
+                                }}
+                                ko‘rish
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </article>
+
+            </section>
+
+
+            <!-- VIDEOS -->
+
+            <section
+                class="latest-videos-section"
+                id="videos"
+            >
+
+                <div class="videos-section-header">
+
+                    <div>
+
+                        <span class="small-label">
+                            KONTENT
+                        </span>
+
+                        <h2>
+                            So‘nggi videolar
+                        </h2>
+
+                    </div>
+
+                    <span class="video-count-badge">
+                        {{ videos|length }} ta
+                    </span>
+
+                </div>
+
+
+                {% if videos %}
+
+                    <div class="latest-video-grid">
+
+                        {% for video in videos %}
+
+                            <article class="video-dashboard-card">
+
+                                <div class="video-thumbnail-wrap">
+
+                                    {% if video.thumbnail %}
+
+                                        <img
+                                            src="{{ video.thumbnail }}"
+                                            alt="{{ video.title }}"
+                                        >
+
+                                    {% endif %}
+
+
+                                    <a
+                                        href="https://www.youtube.com/watch?v={{ video.id }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="video-play-overlay"
+                                    >
+                                        ▶
+                                    </a>
+
+
+                                    <div class="video-view-pill">
+                                        👁
+                                        {{
+                                            video.views
+                                            |compact_number
+                                        }}
+                                    </div>
+
+                                </div>
+
+
+                                <div class="video-card-content">
+
+                                    <h3 title="{{ video.title }}">
+                                        {{ video.title }}
+                                    </h3>
+
+
+                                    <div class="video-mini-stats">
+
+                                        <span>
+                                            👍
+                                            {{
+                                                video.likes
+                                                |compact_number
+                                            }}
+                                        </span>
+
+                                        <span>
+                                            💬
+                                            {{
+                                                video.comments
+                                                |compact_number
+                                            }}
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="video-card-bottom">
+
+                                        <span>
+                                            YouTube
+                                        </span>
+
+                                        <a
+                                            href="https://www.youtube.com/watch?v={{ video.id }}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            Videoni ochish ↗
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <div class="videos-empty">
+
+                        <div class="empty-video-logo">
+                            ▶
+                        </div>
+
+                        <h3>
+                            Hali videolar yo‘q
+                        </h3>
+
+                        <p>
+                            Kanalga birinchi video
+                            yuklanganda u shu yerda
+                            ko‘rinadi.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+
+<!-- AI ANALYSIS MODAL -->
+<div class="ai-modal" id="aiAnalysisModal" aria-hidden="true">
+    <div class="ai-modal-backdrop" data-ai-close></div>
+
+    <section class="ai-modal-panel" role="dialog" aria-modal="true" aria-labelledby="aiModalTitle">
+        <div class="ai-modal-glow"></div>
+
+        <header class="ai-modal-header">
+            <div class="ai-modal-title-wrap">
+                <div class="ai-modal-icon">✦</div>
+                <div>
+                    <span>LLAMA 3.2 • LOKAL AI</span>
+                    <h2 id="aiModalTitle">AI kanal tahlili</h2>
+                </div>
+            </div>
+
+            <button class="ai-modal-close" type="button" data-ai-close aria-label="Yopish">×</button>
+        </header>
+
+        <div class="ai-modal-body">
+            <div class="ai-loading" id="aiAnalysisLoading">
+                <div class="ai-orb">✦</div>
+                <strong>Kanal tahlil qilinmoqda...</strong>
+                <span>AI kanal statistikasi va so‘nggi videolarni ko‘rib chiqyapti.</span>
+                <div class="ai-loading-bar"><i></i></div>
+            </div>
+
+            <div class="ai-error" id="aiAnalysisError" hidden></div>
+            <div class="ai-result" id="aiAnalysisResult" hidden></div>
+        </div>
+
+        <footer class="ai-modal-footer">
+            <span>Ma'lumotlar: YouTube Data API • Model: llama3.2</span>
+            <button type="button" id="aiAnalyzeAgain" hidden>↻ Qayta tahlil</button>
+        </footer>
+    </section>
+</div>
+
+
+<!-- AI VIDEO HELPER MODAL -->
+<div class="video-helper-modal" id="videoHelperModal" aria-hidden="true">
+    <div class="video-helper-backdrop" data-video-helper-close></div>
+
+    <section class="video-helper-panel" role="dialog" aria-modal="true" aria-labelledby="videoHelperTitle">
+        <header class="video-helper-header">
+            <div>
+                <span>LLAMA 3.2 • LOKAL AI</span>
+                <h2 id="videoHelperTitle">💡 AI Video Yordamchi</h2>
+            </div>
+            <button type="button" class="video-helper-close" data-video-helper-close aria-label="Yopish">×</button>
+        </header>
+
+        <div class="video-helper-body">
+            <div class="video-helper-form" id="videoHelperForm">
+                <label for="videoTopic">Video mavzusi</label>
+                <textarea id="videoTopic" maxlength="500" placeholder="Masalan: ukam bilan Robloxda elementlarni boshqarib jang qildik"></textarea>
+                <p>Mavzuni qisqacha yoz. AI title, description, hashtag, tag, thumbnail g‘oyasi va video rejasini tayyorlaydi.</p>
+                <button type="button" id="generateVideoPack">✦ Kontent tayyorlash</button>
+            </div>
+
+            <div class="video-helper-loading" id="videoHelperLoading" hidden>
+                <div class="video-helper-orb">✦</div>
+                <strong>Video paketi tayyorlanmoqda...</strong>
+                <span>llama3.2 mavzu va kanal kontekstini tahlil qilyapti.</span>
+            </div>
+
+            <div class="video-helper-error" id="videoHelperError" hidden></div>
+            <div class="video-helper-result" id="videoHelperResult" hidden></div>
+        </div>
+
+        <footer class="video-helper-footer">
+            <span>Title • Description • Hashtag • Tags • Thumbnail • Reja</span>
+            <button type="button" id="videoHelperAgain" hidden>↻ Yangi mavzu</button>
+        </footer>
+    </section>
+</div>
+
+<script
+    src="{{ url_for('static', filename='script.js') }}"
+></script>
+<script>
+(function () {
+    const analyticsButton = document.getElementById("channelAnalyticsButton");
+
+    if (analyticsButton) {
+        analyticsButton.addEventListener("click", function () {
+            const analyticsSection = document.getElementById("analytics");
+
+            if (analyticsSection) {
+                analyticsSection.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+                if (window.history && window.history.replaceState) {
+                    window.history.replaceState(null, "", "#analytics");
+                } else {
+                    window.location.hash = "analytics";
+                }
+            }
+        });
+    }
+})();
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanallarim — YouTube Manager</title>
+    <link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='images/logo.png') }}"
+>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .channels-page-wrap{padding:34px;max-width:1500px;margin:0 auto}
+        .channels-page-hero{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:26px;padding:30px;background:linear-gradient(135deg,rgba(255,25,60,.16),rgba(10,12,22,.86) 52%,rgba(70,35,255,.12));margin-bottom:24px}
+        .channels-page-hero:after{content:"▶";position:absolute;right:42px;top:50%;transform:translateY(-50%) rotate(-8deg);font-size:110px;color:rgba(255,255,255,.045)}
+        .channels-page-hero .eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;color:#ff5368;margin:0 0 8px}
+        .channels-page-hero h1{font-size:34px;margin:0 0 8px}
+        .channels-page-hero p{margin:0;color:rgba(255,255,255,.62);max-width:650px}
+        .channels-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:24px}
+        .channels-summary-card{border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:18px;background:rgba(255,255,255,.035)}
+        .channels-summary-card span{display:block;color:rgba(255,255,255,.55);font-size:13px;margin-bottom:8px}
+        .channels-summary-card strong{font-size:24px}
+        .channels-toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px}
+        .channels-toolbar .channel-search{flex:1;max-width:520px}
+        .channels-add-box{border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:20px;background:rgba(255,255,255,.03);margin-bottom:22px}
+        .channels-add-box h2{font-size:18px;margin:0 0 6px}
+        .channels-add-box p{margin:0 0 15px;color:rgba(255,255,255,.58)}
+        .channels-add-form{display:flex;gap:10px}
+        .channels-add-form input{flex:1;min-width:0;border:1px solid rgba(255,255,255,.09);background:rgba(0,0,0,.2);color:#fff;border-radius:14px;padding:14px 16px;outline:none}
+        .channels-add-form input:focus{border-color:rgba(255,50,80,.65);box-shadow:0 0 0 3px rgba(255,50,80,.08)}
+        .channels-add-form button{border:0;border-radius:14px;padding:0 20px;font-weight:800;color:#fff;background:linear-gradient(135deg,#ff1744,#ff3d63);cursor:pointer}
+        .my-channel-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+        .my-channel-card{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.08);border-radius:24px;background:rgba(255,255,255,.035);padding:20px;transition:.2s ease}
+        .my-channel-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.16)}
+        .channel-top{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+        .channel-top img,.channel-fallback{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.1)}
+        .channel-fallback{display:grid;place-items:center;background:rgba(255,0,50,.15);font-size:25px}
+        .channel-info{min-width:0}
+        .channel-info h3{margin:0 0 5px;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .channel-info p{margin:0;color:rgba(255,255,255,.45);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .channel-mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:17px}
+        .channel-mini-stat{padding:12px 8px;border-radius:15px;background:rgba(255,255,255,.035);text-align:center}
+        .channel-mini-stat strong{display:block;font-size:15px;margin-bottom:4px}
+        .channel-mini-stat span{font-size:10px;color:rgba(255,255,255,.48)}
+        .channel-actions{display:grid;grid-template-columns:1fr auto;gap:9px}
+        .channel-open{display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:13px;padding:12px 14px;background:rgba(255,255,255,.08);color:#fff;font-weight:700}
+        .channel-open:hover{background:rgba(255,255,255,.13)}
+        .channel-remove-form{margin:0}
+        .channel-remove{height:100%;border:1px solid rgba(255,70,90,.18);border-radius:13px;background:rgba(255,40,70,.08);color:#ff7587;padding:0 14px;cursor:pointer}
+        .channels-empty{border:1px dashed rgba(255,255,255,.12);border-radius:24px;padding:55px 20px;text-align:center;color:rgba(255,255,255,.6)}
+        .channels-empty .big{font-size:42px;margin-bottom:10px}
+        .page-flashes{margin-bottom:16px}
+        .page-flash{padding:13px 16px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(255,255,255,.05);margin-bottom:8px}
+        @media(max-width:1100px){.my-channel-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.channels-summary{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:720px){.channels-page-wrap{padding:20px 14px}.my-channel-grid{grid-template-columns:1fr}.channels-add-form{flex-direction:column}.channels-add-form button{padding:14px}.channels-summary{grid-template-columns:1fr 1fr}.channels-page-hero h1{font-size:27px}.channels-page-hero:after{display:none}}
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="brand-logo">
+    <img
+        src="{{ url_for('static', filename='images/logo.png') }}"
+        alt="YouTube Manager"
+    >
+</div>
+            <div class="brand-text"><strong>YouTube</strong><span>Manager</span></div>
+        </div>
+
+        <button class="sidebar-close" id="sidebarClose" type="button">×</button>
+
+        <nav class="sidebar-menu">
+            <a href="{{ url_for('index') }}" class="menu-item">
+                <span class="menu-icon">⌂</span><span>Bosh sahifa</span>
+            </a>
+            <a href="{{ url_for('channels_page') }}" class="menu-item active">
+                <span class="menu-icon">▣</span><span>Kanallarim</span>
+            </a>
+            <a href="{{ url_for('analytics_page') }}" class="menu-item">
+                <span class="menu-icon">▥</span><span>Tahlil</span>
+            </a>
+            <a href="{{ url_for('videos_page') }}" class="menu-item">
+                <span class="menu-icon">▶</span><span>Videolar</span>
+            </a>
+            <a href="{{ url_for('ideas_page') }}" class="menu-item">
+                <span class="menu-icon">💡</span><span>G‘oyalar</span><span class="new-badge">YANGI</span>
+            </a>
+            <a href="{{ url_for('assistant_page') }}" class="menu-item">
+                <span class="menu-icon">✦</span><span>AI Yordamchi</span>
+            </a>
+            <a href="{{ url_for('settings_page') }}" class="menu-item">
+                <span class="menu-icon">⚙</span><span>Sozlamalar</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="pro-card">
+                <div class="pro-icon">👑</div>
+                <h3>YouTube'ni rivojlantiring!</h3>
+                <p>Kanal ma'lumotlaringizni bitta zamonaviy boshqaruv panelida kuzating.</p>
+                <button type="button">✦ Ko‘proq imkoniyatlar</button>
+            </div>
+
+            <div class="sidebar-user">
+                {% if user.picture %}
+                    <img src="{{ user.picture }}" alt="Profil rasmi">
+                {% else %}
+                    <div class="avatar-placeholder">{{ user.name[0]|upper }}</div>
+                {% endif %}
+                <div><strong>{{ user.name }}</strong><span>{{ user.email }}</span></div>
+                <a href="{{ url_for('logout') }}" class="sidebar-logout" title="Chiqish">↪</a>
+            </div>
+        </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="mobile-menu-button" id="mobileMenuButton" type="button">☰</button>
+            <div class="search-box">
+                <span>⌕</span>
+                <input id="globalSearch" type="text" placeholder="Kanallarni qidirish...">
+                <kbd>Ctrl + K</kbd>
+            </div>
+            <div class="top-actions">
+                <button class="notification-button" type="button">🔔<span></span></button>
+                <div class="top-profile">
+                    {% if user.picture %}
+                        <img src="{{ user.picture }}" alt="Profil">
+                    {% else %}
+                        <div class="top-avatar">{{ user.name[0]|upper }}</div>
+                    {% endif %}
+                    <div><strong>{{ user.name }}</strong><span>Foydalanuvchi</span></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="channels-page-wrap">
+            <section class="channels-page-hero">
+                <p class="eyebrow">KANALLAR BOSHQARUVI</p>
+                <h1>Kanallarim</h1>
+                <p>Ulangan YouTube kanallaringizni ko‘ring, boshqaruv paneliga o‘ting yoki yangi kanal qo‘shing.</p>
+            </section>
+
+            {% set totals = namespace(subscribers=0, views=0, videos=0) %}
+            {% for channel in channels %}
+                {% if channel.subscribers != "?" and channel.subscribers != "Yashirilgan" %}
+                    {% set totals.subscribers = totals.subscribers + channel.subscribers|int %}
+                {% endif %}
+                {% if channel.views != "?" %}
+                    {% set totals.views = totals.views + channel.views|int %}
+                {% endif %}
+                {% if channel.videos != "?" %}
+                    {% set totals.videos = totals.videos + channel.videos|int %}
+                {% endif %}
+            {% endfor %}
+
+            <section class="channels-summary">
+                <div class="channels-summary-card"><span>Ulangan kanallar</span><strong>{{ channels|length }}</strong></div>
+                <div class="channels-summary-card"><span>Jami obunachilar</span><strong>{{ totals.subscribers|compact_number }}</strong></div>
+                <div class="channels-summary-card"><span>Jami ko‘rishlar</span><strong>{{ totals.views|compact_number }}</strong></div>
+                <div class="channels-summary-card"><span>Jami videolar</span><strong>{{ totals.videos|compact_number }}</strong></div>
+            </section>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="page-flashes">
+                        {% for message in messages %}
+                            <div class="page-flash">● {{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <section class="channels-add-box">
+                <h2>+ Yangi kanal qo‘shish</h2>
+                <p>YouTube Channel ID kiriting. Kanal ma'lumotlari avtomatik olinadi.</p>
+                <form action="{{ url_for('add_channel') }}" method="POST" class="channels-add-form">
+                    <input type="text" name="channel_id" placeholder="UCxxxxxxxxxxxxxxxx" autocomplete="off" required>
+                    <button type="submit">▶ Kanalni ulash</button>
+                </form>
+            </section>
+
+            <div class="channels-toolbar">
+                <div>
+                    <strong>{{ channels|length }} ta kanal</strong>
+                </div>
+                <div class="channel-search">
+                    <span>⌕</span>
+                    <input type="text" id="channelSearch" placeholder="Kanal nomi yoki ID...">
+                </div>
+            </div>
+
+            {% if channels %}
+                <section class="my-channel-grid" id="channelGrid">
+                    {% for channel in channels %}
+                        <article class="my-channel-card"
+                                 data-channel-name="{{ channel.title|lower }}"
+                                 data-channel-id="{{ channel.id|lower }}">
+                            <div class="channel-top">
+                                {% if channel.thumbnail %}
+                                    <img src="{{ channel.thumbnail }}" alt="{{ channel.title }}">
+                                {% else %}
+                                    <div class="channel-fallback">▶</div>
+                                {% endif %}
+                                <div class="channel-info">
+                                    <h3>{{ channel.title }}</h3>
+                                    <p>{{ channel.id }}</p>
+                                </div>
+                            </div>
+
+                            <div class="channel-mini-stats">
+                                <div class="channel-mini-stat"><strong>{{ channel.subscribers }}</strong><span>Obunachilar</span></div>
+                                <div class="channel-mini-stat"><strong>{{ channel.views }}</strong><span>Ko‘rishlar</span></div>
+                                <div class="channel-mini-stat"><strong>{{ channel.videos }}</strong><span>Videolar</span></div>
+                            </div>
+
+                            <div class="channel-actions">
+                                <a class="channel-open" href="{{ url_for('channel_dashboard', channel_id=channel.id) }}">▥ Boshqaruv paneli</a>
+                                <form action="{{ url_for('remove_channel', channel_id=channel.id) }}"
+                                      method="POST"
+                                      class="channel-remove-form"
+                                      onsubmit="return confirm('Bu kanalni ro‘yxatdan olib tashlaysizmi?');">
+                                    <button class="channel-remove" type="submit" title="Kanalni olib tashlash">✕</button>
+                                </form>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </section>
+                <div class="channels-empty" id="searchEmpty" style="display:none">
+                    <div class="big">⌕</div>
+                    <h3>Kanal topilmadi</h3>
+                    <p>Boshqa kanal nomi yoki Channel ID bilan qidirib ko‘ring.</p>
+                </div>
+            {% else %}
+                <div class="channels-empty">
+                    <div class="big">▶</div>
+                    <h3>Hali kanal qo‘shilmagan</h3>
+                    <p>Yuqoridagi maydonga Channel ID kiriting va birinchi kanalingizni ulang.</p>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script>
+(function () {
+    const input = document.getElementById("channelSearch");
+    const cards = Array.from(document.querySelectorAll(".my-channel-card"));
+    const empty = document.getElementById("searchEmpty");
+
+    if (!input || !cards.length) return;
+
+    input.addEventListener("input", function () {
+        const q = input.value.trim().toLowerCase();
+        let visible = 0;
+
+        cards.forEach(function (card) {
+            const name = card.dataset.channelName || "";
+            const id = card.dataset.channelId || "";
+            const show = !q || name.includes(q) || id.includes(q);
+            card.style.display = show ? "" : "none";
+            if (show) visible += 1;
+        });
+
+        if (empty) empty.style.display = visible ? "none" : "block";
+    });
+})();
+</script>
+</body>
+</html>
