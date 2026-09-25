@@ -34,9 +34,21 @@ app.config["SECRET_KEY"] = os.getenv(
     "development-only-secret"
 )
 
-app.config["SQLALCHEMY_DATABASE_URI"] = (
+database_url = os.getenv(
+    "DATABASE_URL",
     "sqlite:///manager.db"
 )
+
+# Ba'zi hosting xizmatlari eski postgres:// formatini berishi mumkin.
+# SQLAlchemy esa postgresql:// formatini kutadi.
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace(
+        "postgres://",
+        "postgresql://",
+        1
+    )
+
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 
 app.config[
     "SQLALCHEMY_TRACK_MODIFICATIONS"
