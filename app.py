@@ -129,6 +129,14 @@ app.jinja_env.filters[
     "compact_number"
 ] = format_number
 
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
 
 @app.context_processor
 def inject_notification_count():

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | YouTube Manager</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}">
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: #08090d;
+            color: #e8e8ed;
+            font-family: Arial, sans-serif;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 60px 24px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 50px;
+        }
+
+        .logo img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+        }
+
+        .logo strong {
+            font-size: 20px;
+        }
+
+        h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            margin-top: 40px;
+            color: #fff;
+        }
+
+        p, li {
+            color: #a9abb5;
+        }
+
+        a {
+            color: #ff304f;
+        }
+
+        .updated {
+            color: #777b88;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: #101117;
+            border: 1px solid #24262f;
+            border-radius: 18px;
+            padding: 32px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="logo">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="YouTube Manager">
+        <strong>YouTube Manager</strong>
+    </div>
+
+    <div class="card">
+
+        <h1>Privacy Policy</h1>
+        <p class="updated">Last updated: September 25, 2026</p>
+
+        <p>
+            YouTube Manager is a web application designed to help users
+            monitor YouTube channels, view channel and video statistics,
+            receive channel notifications, and use AI-powered tools for
+            content analysis and idea generation.
+        </p>
+
+        <h2>1. Information We Collect</h2>
+
+        <p>When you sign in with Google, we may receive:</p>
+
+        <ul>
+            <li>Your Google account identifier</li>
+            <li>Your email address</li>
+            <li>Your display name</li>
+            <li>Your profile picture</li>
+        </ul>
+
+        <p>
+            We use this information to create and identify your
+            YouTube Manager account.
+        </p>
+
+        <h2>2. YouTube Data</h2>
+
+        <p>
+            Users can add YouTube channels by Channel ID.
+            YouTube Manager uses the YouTube Data API to retrieve
+            publicly available channel and video information.
+        </p>
+
+        <p>This may include:</p>
+
+        <ul>
+            <li>Channel name, description and thumbnail</li>
+            <li>Subscriber, view and video counts</li>
+            <li>Public video titles and descriptions</li>
+            <li>Video thumbnails and publication dates</li>
+            <li>Public view, like and comment counts</li>
+        </ul>
+
+        <p>
+            YouTube Manager does not request access to modify,
+            upload, delete, or privately manage content on your
+            YouTube account.
+        </p>
+
+        <h2>3. Information Stored by YouTube Manager</h2>
+
+        <p>
+            We may store account information, channels added by the user,
+            channel statistics snapshots and application notifications
+            required to provide the service.
+        </p>
+
+        <h2>4. AI Features</h2>
+
+        <p>
+            YouTube Manager provides AI-powered features such as channel
+            analysis, content ideas and an AI assistant.
+        </p>
+
+        <p>
+            Relevant channel statistics, public video information,
+            and text provided to AI features may be sent to our
+            AI service provider, Groq, to generate responses.
+        </p>
+
+        <h2>5. How We Use Information</h2>
+
+        <p>Information is used to:</p>
+
+        <ul>
+            <li>Authenticate users</li>
+            <li>Display YouTube channel statistics</li>
+            <li>Provide analytics and notifications</li>
+            <li>Generate AI-assisted analysis and content ideas</li>
+            <li>Operate and improve YouTube Manager</li>
+        </ul>
+
+        <h2>6. Data Sharing</h2>
+
+        <p>
+            We do not sell users' personal information.
+            Information may be processed by service providers required
+            to operate the application, including Google/YouTube,
+            our hosting infrastructure, and our AI service provider.
+        </p>
+
+        <h2>7. Data Retention and Deletion</h2>
+
+        <p>
+            Application data may be retained while it is needed to
+            provide YouTube Manager. Users may request deletion of
+            their stored account data by contacting us using the
+            contact information below.
+        </p>
+
+        <h2>8. Google API Services</h2>
+
+        <p>
+            YouTube Manager's use of information received from Google
+            APIs will comply with the Google API Services User Data
+            Policy, including the Limited Use requirements where
+            applicable.
+        </p>
+
+        <h2>9. Changes to This Policy</h2>
+
+        <p>
+            We may update this Privacy Policy as YouTube Manager evolves.
+            The latest version will be available on this page.
+        </p>
+
+        <h2>10. Contact</h2>
+
+        <p>
+            For privacy questions or data deletion requests, contact:
+            <strong>ziyodbekartik@gmail.com</strong>
+        </p>
+
+        <p>
+            <a href="{{ url_for('terms') }}">Terms of Service</a>
+            ·
+            <a href="/">Return to YouTube Manager</a>
+        </p>
+
+    </div>
+</div>
+</body>
+</html>

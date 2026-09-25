@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | YouTube Manager</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}">
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: #08090d;
+            color: #e8e8ed;
+            font-family: Arial, sans-serif;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 60px 24px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 50px;
+        }
+
+        .logo img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+        }
+
+        h1 {
+            font-size: 42px;
+        }
+
+        h2 {
+            margin-top: 40px;
+        }
+
+        p, li {
+            color: #a9abb5;
+        }
+
+        a {
+            color: #ff304f;
+        }
+
+        .updated {
+            color: #777b88;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: #101117;
+            border: 1px solid #24262f;
+            border-radius: 18px;
+            padding: 32px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="logo">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="YouTube Manager">
+        <strong>YouTube Manager</strong>
+    </div>
+
+    <div class="card">
+
+        <h1>Terms of Service</h1>
+        <p class="updated">Last updated: September 25, 2026</p>
+
+        <p>
+            By using YouTube Manager, you agree to these Terms of Service.
+        </p>
+
+        <h2>1. The Service</h2>
+
+        <p>
+            YouTube Manager provides tools for viewing YouTube channel
+            information, analytics, notifications and AI-assisted
+            content analysis.
+        </p>
+
+        <h2>2. Google and YouTube</h2>
+
+        <p>
+            Some features depend on Google and YouTube services.
+            By using these features, you also agree to applicable
+            Google and YouTube terms and policies.
+        </p>
+
+        <h2>3. User Responsibilities</h2>
+
+        <p>
+            You agree to use YouTube Manager lawfully and not attempt
+            to abuse, disrupt, reverse engineer, or gain unauthorized
+            access to the service or other users' information.
+        </p>
+
+        <h2>4. AI-Generated Content</h2>
+
+        <p>
+            AI-generated suggestions, analyses and content ideas may
+            contain errors or incomplete information. Users are
+            responsible for reviewing AI-generated output before using it.
+        </p>
+
+        <h2>5. Availability</h2>
+
+        <p>
+            We do not guarantee that YouTube Manager or third-party
+            services it depends on will always be available without
+            interruption or error.
+        </p>
+
+        <h2>6. Changes</h2>
+
+        <p>
+            Features and these Terms may be updated as the service
+            develops. Updated Terms will be published on this page.
+        </p>
+
+        <h2>7. Contact</h2>
+
+        <p>
+            Questions regarding these Terms can be sent to:
+            <strong>ziyodbekartik@gmail.com</strong>
+        </p>
+
+        <p>
+            <a href="{{ url_for('privacy') }}">Privacy Policy</a>
+            ·
+            <a href="/">Return to YouTube Manager</a>
+        </p>
+
+    </div>
+</div>
+</body>
+</html>
