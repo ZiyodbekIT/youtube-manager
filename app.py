@@ -1600,6 +1600,22 @@ def remove_channel(channel_id):
 
     title = channel.title
 
+    # Kanalga bog'langan notificationlarni o'chirish
+    Notification.query.filter_by(
+        user_id=user.id,
+        channel_id=channel.id
+    ).delete(
+        synchronize_session=False
+    )
+
+    # Kanalga bog'langan snapshotni o'chirish
+    ChannelSnapshot.query.filter_by(
+        channel_id=channel.id
+    ).delete(
+        synchronize_session=False
+    )
+
+    # Endi kanalni xavfsiz o'chirish mumkin
     db.session.delete(channel)
     db.session.commit()
 
