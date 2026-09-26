@@ -35,6 +35,94 @@ def get_youtube():
 # CHANNEL INFO
 # ==========================================
 
+def resolve_channel_id(channel_input):
+    """
+    Channel ID yoki YouTube kanal linkidan
+    haqiqiy Channel ID'ni topadi.
+
+    Qabul qiladi:
+    - UCxxxxxxxx...
+    - youtube.com/channel/UCxxxxxxxx...
+    - youtube.com/@handle
+    - @handle
+    """
+
+    if not channel_input:
+        return None
+
+    channel_input = channel_input.strip()
+
+    # ------------------------------------------
+    # Oddiy Channel ID
+    # ------------------------------------------
+
+    if (
+        channel_input.startswith("UC")
+        and "/" not in channel_input
+        and " " not in channel_input
+    ):
+        return channel_input
+
+    # ------------------------------------------
+    # @handle
+    # ------------------------------------------
+
+    handle = None
+
+    if channel_input.startswith("@"):
+        handle = channel_input
+
+    elif "/@" in channel_input:
+        handle = (
+            channel_input
+            .split("/@", 1)[1]
+            .split("/", 1)[0]
+            .split("?", 1)[0]
+        )
+
+        handle = f"@{handle}"
+
+    # ------------------------------------------
+    # youtube.com/channel/UC...
+    # ------------------------------------------
+
+    elif "/channel/" in channel_input:
+        channel_id = (
+            channel_input
+            .split("/channel/", 1)[1]
+            .split("/", 1)[0]
+            .split("?", 1)[0]
+        )
+
+        if channel_id.startswith("UC"):
+            return channel_id
+
+    # ------------------------------------------
+    # Handle orqali YouTube API
+    # ------------------------------------------
+
+    if handle:
+        youtube = get_youtube()
+
+        request = youtube.channels().list(
+            part="id",
+            forHandle=handle
+        )
+
+        response = request.execute()
+
+        items = response.get(
+            "items",
+            []
+        )
+
+        if not items:
+            return None
+
+        return items[0].get("id")
+
+    return None
+
 def get_channel_info(channel_id):
 
     channel_id = channel_id.strip()

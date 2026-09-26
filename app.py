@@ -21,6 +21,7 @@ from database import db, User, Channel, ChannelSnapshot, Notification
 from youtube import (
     get_channel_info,
     get_latest_videos,
+    resolve_channel_id
 )
 
 
@@ -1483,31 +1484,14 @@ def add_channel():
             url_for("login")
         )
 
-    channel_id = request.form.get(
+    channel_input = request.form.get(
         "channel_id",
         ""
     ).strip()
 
-    if not channel_id:
+    if not channel_input:
         flash(
-            "Kanal ID'sini kiriting."
-        )
-
-        return redirect(
-            url_for("index")
-        )
-
-    existing_channel = (
-        Channel.query.filter_by(
-            user_id=user.id,
-            youtube_channel_id=channel_id
-        ).first()
-    )
-
-    if existing_channel:
-        flash(
-            "Bu kanal hisobingizga "
-            "allaqachon qo‘shilgan."
+            "Kanal ID yoki linkini kiriting."
         )
 
         return redirect(
@@ -1515,17 +1499,50 @@ def add_channel():
         )
 
     try:
-        channel_info = (
-            get_channel_info(
-                channel_id
+        # Channel ID, /channel/ link yoki @handle
+        # linkini haqiqiy Channel ID'ga aylantiramiz.
+        channel_id = resolve_channel_id(
+            channel_input
+        )
+
+        if not channel_id:
+            flash(
+                "YouTube kanali topilmadi. "
+                "Kanal ID yoki linkini tekshiring."
             )
+
+            return redirect(
+                url_for("index")
+            )
+
+        # Muhim: duplicate tekshiruvi endi
+        # foydalanuvchi kiritgan link bilan emas,
+        # haqiqiy Channel ID bilan qilinadi.
+        existing_channel = (
+            Channel.query.filter_by(
+                user_id=user.id,
+                youtube_channel_id=channel_id
+            ).first()
+        )
+
+        if existing_channel:
+            flash(
+                "Bu kanal hisobingizga "
+                "allaqachon qo‘shilgan."
+            )
+
+            return redirect(
+                url_for("index")
+            )
+
+        channel_info = get_channel_info(
+            channel_id
         )
 
         if not channel_info:
             flash(
                 "Bunday YouTube kanali "
-                "topilmadi. ID'ni "
-                "tekshiring."
+                "topilmadi."
             )
 
             return redirect(

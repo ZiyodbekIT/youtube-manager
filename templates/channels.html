@@ -177,9 +177,9 @@
 
             <section class="channels-add-box">
                 <h2>+ Yangi kanal qo‘shish</h2>
-                <p>YouTube Channel ID kiriting. Kanal ma'lumotlari avtomatik olinadi.</p>
+                <p>YouTube kanal linki yoki Channel ID kiriting. Kanal ma'lumotlari avtomatik olinadi.</p>
                 <form action="{{ url_for('add_channel') }}" method="POST" class="channels-add-form">
-                    <input type="text" name="channel_id" placeholder="UCxxxxxxxxxxxxxxxx" autocomplete="off" required>
+                    <input type="text" name="channel_id" placeholder="https://youtube.com/@kanalingiz" autocomplete="off" required>
                     <button type="submit">▶ Kanalni ulash</button>
                 </form>
             </section>
@@ -239,7 +239,7 @@
                 <div class="channels-empty">
                     <div class="big">▶</div>
                     <h3>Hali kanal qo‘shilmagan</h3>
-                    <p>Yuqoridagi maydonga Channel ID kiriting va birinchi kanalingizni ulang.</p>
+                    <p>YouTube kanal linkini kiriting va birinchi kanalingizni ulang.</p>
                 </div>
             {% endif %}
         </div>
